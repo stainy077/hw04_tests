@@ -143,6 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Блок констант
 POSTS_COUNT: Final[int] = 10
+POSTS_TEST_COUNT: Final[int] = 3
 FIRST_CHARACTERS: Final[int] = 15
 STATUS_CODE_OK: Final[int] = 200
 STATUS_CODE_REDIRECT: Final[int] = 302

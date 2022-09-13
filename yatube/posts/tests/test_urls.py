@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 
 from posts.models import Group, Post
-
-from yatube.settings import (STATUS_CODE_OK, STATUS_CODE_REDIRECT,
-                             STATUS_CODE_404)
+from yatube.settings import (STATUS_CODE_404, STATUS_CODE_OK,
+                             STATUS_CODE_REDIRECT)
 
 START_PAGE = '/'
 NEW_POST_PAGE = '/create/'
