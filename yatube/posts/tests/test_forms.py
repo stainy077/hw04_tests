@@ -33,8 +33,7 @@ class PostFormTests(TestCase):
         """Валидная форма создает запись в Post."""
         posts_count = Post.objects.count()
         form_data = {
-            'text': self.test_post.text,
-            'author': self.test_post.author,
+            'text': 'Другое сообщение!!!',
             'group': self.test_group.id,
         }
         response = self.authorized_client.post(
@@ -43,15 +42,16 @@ class PostFormTests(TestCase):
         )
         self.assertRedirects(response, reverse(
             'posts:profile',
-            kwargs={'username': self.test_post.author},
+            kwargs={'username': self.user},
         ))
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        new_post = Post.objects.last()
-        self.assertTrue(new_post)
-
-        self.assertEqual(new_post.text, PostFormTests.test_post.text)
-        self.assertEqual(new_post.author, PostFormTests.test_post.author)
-        self.assertEqual(new_post.group, PostFormTests.test_group)
+        self.assertTrue(
+            Post.objects.filter(
+                group=self.test_group,
+                text='Другое сообщение!!!',
+                author=self.user,
+            ).exists()
+        )
 
     def test_post_edit(self):
         """Валидная форма редактирует существующую запись в Post."""

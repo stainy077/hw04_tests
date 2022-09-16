@@ -6,6 +6,8 @@ from django.urls import reverse
 from posts.models import Group, Post
 from yatube.settings import POSTS_COUNT, POSTS_TEST_COUNT
 
+COUNT_FOR_POSTS = 14
+
 
 class PostPagesTest(TestCase):
     """Тестрование страниц приложения posts на корректную
@@ -29,7 +31,6 @@ class PostPagesTest(TestCase):
         )
         cls.test_post = Post.objects.create(
             text='Тестовое сообщение!!!',
-            pub_date='2022-09-12',
             author=cls.test_user1,
             group=cls.ok_group,
         )
@@ -80,13 +81,8 @@ class PostPagesTest(TestCase):
     def test_index_page_show_correct_context(self):
         """View-функция страницы index передает правильный контекст."""
         response = self.authorized_client1.get(reverse('posts:index'))
-        test_post_text = response.context.get('page_obj')[0].text
-        test_post_author = response.context.get('page_obj')[0].author.username
-        test_post_group = response.context.get('page_obj')[0].group.title
-
-        self.assertEqual(test_post_text, 'Тестовое сообщение!!!')
-        self.assertEqual(test_post_author, 'NoName')
-        self.assertEqual(test_post_group, 'Правильная тестовая группа')
+        first_post = response.context['page_obj'][0]
+        self.assertEqual(first_post, self.test_post)
 
     def test_group_list_page_show_correct_context(self):
         """View-функция страницы group_list передает правильный контекст."""
@@ -94,13 +90,8 @@ class PostPagesTest(TestCase):
             'posts:group_list',
             kwargs={'slug': self.ok_group.slug},
         ))
-        test_group_title = response.context.get('group').title
-        test_group_slug = response.context.get('group').slug
-        test_group_description = response.context.get('group').description
-
-        self.assertEqual(test_group_title, 'Правильная тестовая группа')
-        self.assertEqual(test_group_slug, 'ok-slug')
-        self.assertEqual(test_group_description, 'Описание правильной группы')
+        test_group_field = response.context.get('group')
+        self.assertEqual(test_group_field, self.ok_group)
 
     def test_post_create_page_show_correct_context(self):
         """View-функция страницы post_create передает правильный контекст."""
@@ -123,11 +114,8 @@ class PostPagesTest(TestCase):
             'posts:profile',
             kwargs={'username': self.test_post.author},
         ))
-        test_profile_posts = response.context.get('page_obj')[0].text
-        test_profile_group = response.context.get('page_obj')[0].group.title
-
-        self.assertEqual(test_profile_posts, 'Тестовое сообщение!!!')
-        self.assertEqual(test_profile_group, 'Правильная тестовая группа')
+        test_profile_field = response.context.get('page_obj')[0]
+        self.assertEqual(test_profile_field, self.test_post)
 
     def test_post_detail_show_correct_context(self):
         """View-функция страницы поста передает правильный контекст."""
@@ -135,10 +123,8 @@ class PostPagesTest(TestCase):
             'posts:post_detail',
             kwargs={'post_id': self.test_post.id},
         ))
-        post_detail_text = response.context.get('post').text
-        post_detail_group = response.context.get('post').group.title
-        self.assertEqual(post_detail_text, 'Тестовое сообщение!!!')
-        self.assertEqual(post_detail_group, 'Правильная тестовая группа')
+        post_detail_field = response.context.get('post')
+        self.assertEqual(post_detail_field, self.test_post)
 
     def test_post_edit_page_show_correct_context(self):
         """View-функция редактирования поста передает правильный контекст."""
@@ -211,126 +197,52 @@ class PaginatorViewsTest(TestCase):
             slug='ok-slug',
             description='Описание группы',
         )
-        cls.test_post1 = Post.objects.create(
-            text='Тестовое сообщение-1',
-            pub_date='2022-09-12',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post2 = Post.objects.create(
-            text='Тестовое сообщение-2',
-            pub_date='2022-09-12',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post3 = Post.objects.create(
-            text='Тестовое сообщение-3',
-            pub_date='2022-09-13',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post4 = Post.objects.create(
-            text='Тестовое сообщение-4',
-            pub_date='2022-09-13',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post5 = Post.objects.create(
-            text='Тестовое сообщение-5',
-            pub_date='2022-09-14',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post6 = Post.objects.create(
-            text='Тестовое сообщение-6',
-            pub_date='2022-09-12',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post7 = Post.objects.create(
-            text='Тестовое сообщение-7',
-            pub_date='2022-09-13',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post8 = Post.objects.create(
-            text='Тестовое сообщение-8',
-            pub_date='2022-09-14',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post9 = Post.objects.create(
-            text='Тестовое сообщение-9',
-            pub_date='2022-09-15',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post10 = Post.objects.create(
-            text='Тестовое сообщение-10',
-            pub_date='2022-09-15',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post11 = Post.objects.create(
-            text='Тестовое сообщение-11',
-            pub_date='2022-09-12',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post12 = Post.objects.create(
-            text='Тестовое сообщение-12',
-            pub_date='2022-09-13',
-            author=cls.test_user1,
-            group=cls.group,
-        )
-        cls.test_post13 = Post.objects.create(
-            text='Тестовое сообщение-13',
-            pub_date='2022-09-14',
-            author=cls.test_user1,
-            group=cls.group,
-        )
+        cls.test_posts = []
+        for post in range(1, COUNT_FOR_POSTS):
+            cls.test_posts.append(Post(
+                text=f'Тестовое сообщение - {post}',
+                author=cls.test_user1,
+                group=cls.group,
+            ))
+        Post.objects.bulk_create(cls.test_posts)
 
-    def test_first_page_index_contains_ten_records(self):
-        """Проверка: количество постов на главной странице равно 10."""
-        response = self.client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context['page_obj']), POSTS_COUNT)
-
-    def test_second_page_index_contains_three_records(self):
-        """Проверка: на второй странице главной страницы
-        должно быть три поста."""
-        response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), POSTS_TEST_COUNT)
-
-    def test_first_page_group_list_contains_ten_records(self):
-        """Проверка: количество постов на странице группы равно 10."""
-        response = self.client.get(reverse(
+    def setUp(self):
+        self.index_reverse = reverse('posts:index')
+        self.group_list_reverse = reverse(
             'posts:group_list',
-            kwargs={'slug': self.group.slug},
-        ))
-        self.assertEqual(len(response.context['page_obj']), POSTS_COUNT)
-
-    def test_second_page_group_list_contains_three_records(self):
-        """Проверка: на второй странице страницы группы
-        должно быть три поста."""
-        response = self.client.get(reverse(
-            'posts:group_list',
-            kwargs={'slug': self.group.slug},
-        ) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), POSTS_TEST_COUNT)
-
-    def test_first_page_profile_contains_ten_records(self):
-        """Проверка: количество постов на странице автора равно 10."""
-        response = self.client.get(reverse(
+            kwargs={'slug': self.group.slug}
+        )
+        self.profile_reverse = reverse(
             'posts:profile',
-            kwargs={'username': self.test_user1},
-        ))
-        self.assertEqual(len(response.context['page_obj']), POSTS_COUNT)
+            kwargs={'username': self.test_user1}
+        )
 
-    def test_second_page_profile_contains_three_records(self):
-        """Проверка: на второй странице страницы автора
-        должно быть три поста."""
-        response = self.client.get(reverse(
-            'posts:profile',
-            kwargs={'username': self.test_user1},
-        ) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), POSTS_TEST_COUNT)
+    def test_first_page_urls_contains_ten_records(self):
+        """Проверка: количество постов на странице равно 10."""
+        url_reverse_list = [
+            self.index_reverse,
+            self.group_list_reverse,
+            self.profile_reverse,
+        ]
+        for url_reverse in url_reverse_list:
+            with self.subTest(url_reverse=url_reverse):
+                response = self.client.get(url_reverse)
+                self.assertEqual(
+                    len(response.context['page_obj']),
+                    POSTS_COUNT,
+                )
+
+    def test_second_page_urls_contains_three_records(self):
+        """Проверка: на второй странице должно быть три поста."""
+        url_reverse_list = [
+            self.index_reverse,
+            self.group_list_reverse,
+            self.profile_reverse,
+        ]
+        for url_reverse in url_reverse_list:
+            with self.subTest(url_reverse=url_reverse):
+                response = self.client.get(url_reverse + '?page=2')
+                self.assertEqual(
+                    len(response.context['page_obj']),
+                    POSTS_TEST_COUNT,
+                )

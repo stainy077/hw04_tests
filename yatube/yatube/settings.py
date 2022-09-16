@@ -145,9 +145,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 POSTS_COUNT: Final[int] = 10
 POSTS_TEST_COUNT: Final[int] = 3
 FIRST_CHARACTERS: Final[int] = 15
-STATUS_CODE_OK: Final[int] = 200
-STATUS_CODE_REDIRECT: Final[int] = 302
-STATUS_CODE_404: Final[int] = 404
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'
